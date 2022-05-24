@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Todo</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+    integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/reset.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+  <header>
+    <input type="text" id="task" placeholder="タスクを入力してください">
+    <i id="add" class="fas fa-plus-circle fa-2x"></i>
+  </header>
+
+  <main class="container">
+    <!-- 未完了のタスク -->
+    <h2 class="title">Not yet</h2>
+    <ul class="list" id="not-yet"></ul>
+
+    <!-- 完了済みのタスク  -->
+    <div class="finish">
+      <h2 class="title">done</h2>
+      <ul class="list" id="done"></ul>
+    </div>
+  </main>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <script>
+    // 日時をいい感じの形式にする関数
+    function convertTimestampToDatetime(timestamp) {
+      const _d = timestamp ? new Date(timestamp * 1000) : new Date();
+      const Y = _d.getFullYear();
+      const m = (_d.getMonth() + 1).toString().padStart(2, '0');
+      const d = _d.getDate().toString().padStart(2, '0');
+      const H = _d.getHours().toString().padStart(2, '0');
+      const i = _d.getMinutes().toString().padStart(2, '0');
+      const s = _d.getSeconds().toString().padStart(2, '0');
+      return `${Y}/${m}/${d} ${H}:${i}:${s}`;
+    }
+  </script>
+  <!-- 以下にfirebaseのコードを貼り付けよう -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.7.0/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      onSnapshot,
+    } from "https://www.gstatic.com/firebasejs/9.7.0/firebase-firestore.js";
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "",
+      authDomain: "project-170416370730451914.firebaseapp.com",
+      projectId: "project-170416370730451914",
+      storageBucket: "project-170416370730451914.appspot.com",
+      messagingSenderId: "90226237100",
+      appId: "1:90226237100:web:6af0bbe86fc9b76155c909"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    const db = getFirestore(app);
+
+
+    $('#add').click(function () {
+      // 入力欄を取得
+      let inputTask = $('#task')
+      // console.log('inputTask')
+      // 入力値を取得
+      let task = inputTask.val();
+      // console.log(task)
+
+      // 入力値が空かチェック
+      if (task === '') {
+        // 入力値が空の場合、処理を中断
+        return;
+      }
+
+
+
+
+    };
+    addDoc(collection(db, 'chat'), task);
+    });
+
+
+    onSnapshot(collection(db, "chat"), (querySnapshot) => {
+      console.log(querySnapshot.docs);
+
+      const documents = [];
+      querySnapshot.docs.forEach(function (doc) {
+        const data = {
+          id: doc.id,
+          data: doc.data(),
+        };
+        documents.push(data);
+      });
+
+      const htmlElements = [];
+      documents.forEach(function (document) {
+        htmlElements.push(`
+          <li id="${document.id}">
+            <p>${document.data.name} </p>
+          </li>
+        `);
+      })
+      $('#not-yet').html(htmlElements);
+    });
+
+
+  </script>
+
+</body>
+
+</html>
